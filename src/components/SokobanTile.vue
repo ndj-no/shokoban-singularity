@@ -5,6 +5,8 @@
     <span v-else-if="cell === 'C'"><img class="w-[32px]" src="/chest.png" /></span>
     <span v-else-if="cell === 'P'"><img class="w-[32px]" src="/lumine2.png" /></span>
     <span v-else-if="cell === 'M'"><img class="w-[32px]" src="/hilichurl.png" /></span>
+    <span v-else-if="cell === 'T'"><img class="w-[32px]" src="/tree.png" /></span>
+    <span v-else-if="cell === 'K'"><img class="w-[32px]" src="/khunglong.png" /></span>
     <span v-else></span>
   </div>
 </template>
@@ -25,6 +27,8 @@ const style = computed(() => {
       C: '#ffcc00',
       P: '#8ef',
       M: '#a4e',
+      T: '#a7b397',
+      K: '#918f93',
     }[props.cell] || '#eee'
   return { ...pixelStyle, background: bg }
 })
