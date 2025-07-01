@@ -4,9 +4,9 @@
       <div style="position: relative; margin-top: 20px">
         <!-- Rương phóng to -->
         <transition name="chest-bounce" appear>
-          <div v-if="show" style="font-size: 80px; filter: drop-shadow(0px 4px 8px #fa8)">🧰</div>
+          <div v-if="show" class="max-w-[320px]" style="font-size: 80px; filter: drop-shadow(0px 4px 8px #fa8)"><img src="/tada-chest-open.png" /></div>
         </transition>
-        <!-- Trái tim bay ra -->
+        <!-- Mochi chúc mừng -->
         <transition name="heart-fly" appear>
           <div
             v-if="show"
@@ -14,20 +14,17 @@
               position: absolute;
               left: 50%;
               transform: translateX(-50%);
-              font-size: 56px;
-              color: #e44;
+              width: 100%;
             "
             class="heart-fly"
           >
-            ❤️
+            <img src="/mochimazui.png"/>
+            <div v-if="show" class="text-4xl font-bold text-pink-600 mt-8 drop-shadow-lg w-full">
+              Happy Birth Day
+            </div>
           </div>
         </transition>
       </div>
-      <transition name="fade" appear>
-        <div v-if="show" class="text-4xl font-bold text-pink-600 mt-8 drop-shadow-lg">
-          Happy Birth Day
-        </div>
-      </transition>
     </div>
   </transition>
 </template>
@@ -62,10 +59,10 @@ defineProps({
     transform: scale(0.5) rotate(-10deg);
   }
   60% {
-    transform: scale(1.5) rotate(0deg);
+    transform: scale(1) rotate(0deg);
   }
   100% {
-    transform: scale(1.5) rotate(0deg);
+    transform: scale(1) rotate(0deg);
   }
 }
 

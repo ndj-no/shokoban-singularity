@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { tileSize, clone2d, findPos } from '@/utils/sokoban'
+import { tileSize, clone2d, findPos } from '@/utils/sokoban.ts'
 import SokobanTile from '@/components/SokobanTile.vue'
 
 const props = defineProps({
@@ -55,14 +55,15 @@ function move(dx: number, dy: number) {
 }
 
 // QUAN TRỌNG: ĐÚNG LÀ monsterDir, không phải monsterLastDir
-let monsterDir: [number, number] | null = null
+let monsterDir: number[] | null = null
+
 function moveMonster() {
   const mon = findPos(map.value, 'M')
   if (!mon) return
 
   // Nếu chưa có hướng, random hướng
   if (!monsterDir) {
-    const directions: [number, number][] = [
+    const directions: number[][] = [
       [1, 0], // phải
       [-1, 0], // trái
       [0, 1], // xuống
@@ -95,7 +96,7 @@ function moveMonster() {
   }
 
   // Nếu không đi được thì random lại hướng hợp lệ
-  const directions: [number, number][] = [
+  const directions: number[][] = [
     [1, 0], // phải
     [-1, 0], // trái
     [0, 1], // xuống
@@ -140,23 +141,35 @@ onMounted(() => {
     move(dir[0], dir[1])
   })
 
-  if (props.monster) {
-    monsterDir = null // reset hướng mỗi lần vào màn
-    monsterInterval = setInterval(() => {
-      if (!props.finished && !props.gameover) moveMonster()
-    }, 1000)
-  }
+  // if (props.monster) {
+  //   monsterDir = null // reset hướng mỗi lần vào màn
+  //   monsterInterval = setInterval(() => {
+  //     if (!props.finished && !props.gameover) moveMonster()
+  //   }, 1000)
+  // }
 })
 
-onUnmounted(() => {
+const clearMonsterInvterval = () => {
   if (monsterInterval) clearInterval(monsterInterval)
+}
+
+onUnmounted(() => {
+  clearMonsterInvterval()
 })
 
 watch(
-  () => props.initialMap,
-  (val) => {
-    map.value = clone2d(val)
+  () => [props.initialMap, props.monster],
+  ([newMap, newMonster]) => {
+    map.value = clone2d(newMap)
     monsterDir = null // reset hướng khi reset map
+    if (!newMonster) {
+      clearMonsterInvterval();
+    }
+    if (newMonster && !monsterInterval) {
+      monsterInterval = setInterval(() => {
+        if (!props.finished && !props.gameover) moveMonster()
+      }, 1000)
+    }
   },
 )
 </script>

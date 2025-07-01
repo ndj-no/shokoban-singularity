@@ -36,16 +36,16 @@
     <div style="height: 80px" />
     <Congratulation :show="finished" v-if="!gameover" />
     <div v-if="gameover" class="text-3xl font-bold text-red-600 mt-8 drop-shadow-lg animate-bounce">
-      Thua rồi! 😭
+      Awwwwwww!! 😭
     </div>
     <div class="mt-8 text-gray-300 text-lg">
-      <span>Di chuyển: 🡠 🡢 🡡 🡣 hoặc phím <b>WASD</b></span>
+      <span>Move: [<b>🡠 🡢 🡡 🡣</b>] Or [<b>W A S D</b>]</span>
       <button
         v-if="gameover || finished"
         class="ml-6 px-4 py-1 rounded-lg bg-indigo-600 text-white font-bold"
         @click="resetLevel"
       >
-        Chơi lại
+        Retry
       </button>
     </div>
   </div>
@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { mapData1, mapData2, clone2d } from './utils/sokoban'
+import { mapData1, mapData2, clone2d } from './utils/sokoban.ts'
 import SokobanMap from './components/SokobanMap.vue'
 import Congratulation from './components/Congratulation.vue'
 
@@ -62,7 +62,7 @@ const currentMap = ref(clone2d(mapData1))
 const finished = ref(false)
 const gameover = ref(false)
 
-function setLevel(lv) {
+function setLevel(lv: number) {
   level.value = lv
   if (lv === 1) currentMap.value = clone2d(mapData1)
   else currentMap.value = clone2d(mapData2)
