@@ -39,7 +39,6 @@
     <div class="mt-8 text-gray-300 text-lg">
       <span>Move: [ <b>🡠 🡢 🡡 🡣</b> ] or [ <b>W A S D</b> ]</span>
       <button
-        v-if="gameover || finished"
         class="ml-6 px-4 py-1 rounded-lg bg-indigo-600 text-white font-bold"
         @click="resetLevel"
       >
