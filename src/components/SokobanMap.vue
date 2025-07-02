@@ -141,12 +141,7 @@ onMounted(() => {
     move(dir[0], dir[1])
   })
 
-  // if (props.monster) {
-  //   monsterDir = null // reset hướng mỗi lần vào màn
-  //   monsterInterval = setInterval(() => {
-  //     if (!props.finished && !props.gameover) moveMonster()
-  //   }, 1000)
-  // }
+  startMonster(props.monster)
 })
 
 const clearMonsterInvterval = () => {
@@ -157,6 +152,14 @@ onUnmounted(() => {
   clearMonsterInvterval()
 })
 
+const startMonster = (isMonsterEnable: any) => {
+  if (isMonsterEnable && !monsterInterval) {
+    monsterInterval = setInterval(() => {
+      if (!props.finished && !props.gameover) moveMonster()
+    }, 1000)
+  }
+}
+
 watch(
   () => [props.initialMap, props.monster],
   ([newMap, newMonster]) => {
@@ -165,11 +168,7 @@ watch(
     if (!newMonster) {
       clearMonsterInvterval();
     }
-    if (newMonster && !monsterInterval) {
-      monsterInterval = setInterval(() => {
-        if (!props.finished && !props.gameover) moveMonster()
-      }, 1000)
-    }
+    startMonster(newMonster)
   },
 )
 </script>

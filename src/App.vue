@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-col items-center min-h-screen bg-[#222] py-8">
     <h1 class="text-3xl mb-4 text-white font-bold tracking-wider drop-shadow">
-      Mini Sokoban - Happy Birthday
+      Quest for the Lost Treasure
     </h1>
-    <div class="flex gap-4 mb-4">
+    <div class="flex gap-4 mb-4" v-show="false">
       <button
         class="px-4 py-1 rounded-lg bg-pink-500 text-white font-bold"
         :class="{ 'opacity-70': level === 1 }"
@@ -33,21 +33,21 @@
         @gameover="onGameover"
       />
     </div>
-    <div style="height: 80px" />
-    <Congratulation :show="finished" v-if="!gameover" />
     <div v-if="gameover" class="text-3xl font-bold text-red-600 mt-8 drop-shadow-lg animate-bounce">
-      Awwwwwww!! 😭
+      Omae wa mou shindeiru!! 😁
     </div>
     <div class="mt-8 text-gray-300 text-lg">
-      <span>Move: [<b>🡠 🡢 🡡 🡣</b>] Or [<b>W A S D</b>]</span>
+      <span>Move: [ <b>🡠 🡢 🡡 🡣</b> ] or [ <b>W A S D</b> ]</span>
       <button
-        v-if="gameover || finished"
         class="ml-6 px-4 py-1 rounded-lg bg-indigo-600 text-white font-bold"
         @click="resetLevel"
       >
         Retry
       </button>
     </div>
+    <div style="height: 80px" />
+
+    <Congratulation :show="finished" v-if="!gameover" />
   </div>
 </template>
 
@@ -57,8 +57,8 @@ import { mapData1, mapData2, clone2d } from './utils/sokoban.ts'
 import SokobanMap from './components/SokobanMap.vue'
 import Congratulation from './components/Congratulation.vue'
 
-const level = ref(1)
-const currentMap = ref(clone2d(mapData1))
+const level = ref(2)
+const currentMap = ref(clone2d(mapData2))
 const finished = ref(false)
 const gameover = ref(false)
 
