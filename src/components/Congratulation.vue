@@ -7,9 +7,11 @@
         <transition name="zoom" appear>
           <div v-if="props.show" class="flex flex-col items-center relative">
             <transition name="heart-fly" appear>
-              <div v-if="props.show" class="heart-fly max-w-[320px] text-center">
+              <div v-if="props.show" class="heart-fly max-w-[320px] text-center space-y-4">
                 <img src="/tada-chest-open.png" class="mx-auto" />
-                <div class="text-4xl font-bold text-pink-600 mt-8 drop-shadow-lg w-full">
+                <!-- Badge copy code -->
+                <CopyCodeBadge code="123" />
+                <div class="text-4xl font-bold text-pink-600 mt-4 drop-shadow-lg w-full">
                   Happy Birth Day
                 </div>
               </div>
@@ -22,9 +24,9 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  show: Boolean,
-})
+import CopyCodeBadge from './CopyCodeBadge.vue'
+
+const props = defineProps<{ show: boolean; code?: string }>()
 </script>
 
 <style scoped>

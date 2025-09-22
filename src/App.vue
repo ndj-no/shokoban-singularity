@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col items-center min-h-screen bg-[#222] py-8">
-    <h1 class="text-3xl mb-4 text-white font-bold tracking-wider drop-shadow">
+    <!-- <h1 class="text-xl mb-4 text-white font-bold tracking-wider drop-shadow">
       Quest for the Lost Treasure
-    </h1>
+    </h1> -->
     <div class="flex gap-4 mb-4" v-show="false">
       <button
         class="px-4 py-1 rounded-lg bg-pink-500 text-white font-bold"
