@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="rootRef"
     :style="{
       display: 'grid',
       gridTemplateRows: `repeat(${map.length}, ${tileSize}px)`,
@@ -17,6 +18,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { tileSize, clone2d, findPos } from '@/utils/sokoban.ts'
+import { swipeVectorToDir } from '@/utils/input'
 import SokobanTile from '@/components/SokobanTile.vue'
 
 const props = defineProps({
@@ -124,6 +126,49 @@ function moveMonster() {
 
 let monsterInterval: ReturnType<typeof setInterval> | null = null
 
+// --- Touch swipe handling state ---
+// We keep this lightweight and separate from movement logic.
+const rootRef = ref<HTMLElement | null>(null)
+let touchId: number | null = null
+let startX = 0
+let startY = 0
+let swipeDone = false // ensures exactly one move per gesture
+const SWIPE_THRESHOLD = 30 // px; adjust within 24-40 as required
+
+function onTouchStart(e: TouchEvent) {
+  if (props.finished || props.gameover) return
+  if (touchId !== null) return // already tracking one finger (ignore multi-touch)
+  const t = e.changedTouches[0]
+  touchId = t.identifier
+  startX = t.pageX
+  startY = t.pageY
+  swipeDone = false
+}
+
+function onTouchMove(e: TouchEvent) {
+  if (touchId === null) return
+  // find the active touch with our identifier
+  const t = Array.from(e.touches).find((tt) => tt.identifier === touchId)
+  if (!t) return
+  const dx = t.pageX - startX
+  const dy = t.pageY - startY
+  const dir = !swipeDone ? swipeVectorToDir(dx, dy, SWIPE_THRESHOLD) : null
+  if (dir) {
+    move(dir[0], dir[1])
+    swipeDone = true
+  }
+  // Prevent page scroll while interacting within game area
+  e.preventDefault()
+}
+
+function endTouchIfMatch(e: TouchEvent) {
+  if (touchId === null) return
+  if (Array.from(e.changedTouches).some((t) => t.identifier === touchId)) {
+    touchId = null
+    swipeDone = false
+  }
+}
+
 onMounted(() => {
   window.addEventListener('keydown', (e) => {
     if (props.finished || props.gameover) return
@@ -140,7 +185,13 @@ onMounted(() => {
     if (!dir) return
     move(dir[0], dir[1])
   })
-
+  // Attach touch listeners (non-passive so we can preventDefault)
+  if (rootRef.value) {
+    rootRef.value.addEventListener('touchstart', onTouchStart, { passive: false })
+    rootRef.value.addEventListener('touchmove', onTouchMove, { passive: false })
+    rootRef.value.addEventListener('touchend', endTouchIfMatch, { passive: false })
+    rootRef.value.addEventListener('touchcancel', endTouchIfMatch, { passive: false })
+  }
   startMonster(props.monster)
 })
 
@@ -150,6 +201,12 @@ const clearMonsterInvterval = () => {
 
 onUnmounted(() => {
   clearMonsterInvterval()
+  if (rootRef.value) {
+    rootRef.value.removeEventListener('touchstart', onTouchStart)
+    rootRef.value.removeEventListener('touchmove', onTouchMove)
+    rootRef.value.removeEventListener('touchend', endTouchIfMatch)
+    rootRef.value.removeEventListener('touchcancel', endTouchIfMatch)
+  }
 })
 
 const startMonster = (isMonsterEnable: any) => {
