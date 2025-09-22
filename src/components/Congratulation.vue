@@ -12,7 +12,7 @@
                 <!-- Badge copy code -->
                 <CopyCodeBadge code="123" />
                 <div class="text-4xl font-bold text-pink-600 mt-4 drop-shadow-lg w-full">
-                  Happy Birth Day
+                  Happy Birthday
                 </div>
               </div>
             </transition>

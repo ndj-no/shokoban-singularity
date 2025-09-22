@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col items-center min-h-screen bg-[#222] py-8 px-2">
-    <!-- <h1 class="text-xl mb-4 text-white font-bold tracking-wider drop-shadow">
+  <div class="flex flex-col items-center min-h-screen bg-[#222] pt-4 px-2">
+    <h1 class="text-xl mb-4 text-white font-bold tracking-wider drop-shadow">
       Quest for the Lost Treasure
-    </h1> -->
+    </h1>
     <div class="flex gap-4 mb-4" v-show="false">
       <button
         class="px-4 py-1 rounded-lg bg-pink-500 text-white font-bold"
@@ -22,25 +22,36 @@
     <!-- Wrapper để canh giữa và tránh chạm mép, + scale -->
     <div class="w-full flex justify-center overflow-hidden">
       <div
-        ref="mapContainer"
-        class="rounded-2xl shadow-2xl p-2"
+        class="relative"
         :style="{
-          display: 'inline-block',
-          background: '#bbb',
-          border: '4px solid #222',
-          transform: `scale(${mapScale})`,
-          transformOrigin: 'top center',
+          width: scaledWidth ? scaledWidth + 'px' : 'auto',
+          height: scaledHeight ? scaledHeight + 'px' : 'auto',
         }"
       >
-        <SokobanMap
-          :initialMap="currentMap"
-          :finished="finished"
-          :gameover="gameover"
-          :monster="level === 2"
-          @update:map="(m) => (currentMap = m)"
-          @finish="onFinish"
-          @gameover="onGameover"
-        />
+        <div
+          ref="mapContainer"
+          class="rounded-2xl shadow-2xl p-2"
+          :style="{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            display: 'inline-block',
+            background: '#bbb',
+            border: '4px solid #222',
+            transform: `scale(${mapScale})`,
+            transformOrigin: 'top left',
+          }"
+        >
+          <SokobanMap
+            :initialMap="currentMap"
+            :finished="finished"
+            :gameover="gameover"
+            :monster="level === 2"
+            @update:map="(m) => (currentMap = m)"
+            @finish="onFinish"
+            @gameover="onGameover"
+          />
+        </div>
       </div>
     </div>
     <div class="mt-8 text-gray-300 text-lg">
@@ -60,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch, computed } from 'vue'
 import { mapData1, mapData2, clone2d } from './utils/sokoban.ts'
 import SokobanMap from './components/SokobanMap.vue'
 import Congratulation from './components/Congratulation.vue'
@@ -76,29 +87,37 @@ const gameoverDismissed = ref(false) // đã đóng thủ công => không hiện
 // Thêm refs cho scale
 const mapContainer = ref<HTMLElement | null>(null)
 const mapScale = ref(1)
+const baseWidth = ref(0)
+const baseHeight = ref(0)
+const scaledWidth = computed(() => baseWidth.value * mapScale.value)
+const scaledHeight = computed(() => baseHeight.value * mapScale.value)
 
 function calcScaleRaw() {
   if (!mapContainer.value) return 1
+  // đo kích thước trước khi scale (offsetWidth/offsetHeight không chịu ảnh hưởng transform)
+  const bw = mapContainer.value.offsetWidth
+  const bh = mapContainer.value.offsetHeight
+  if (bw && bh) {
+    // chỉ cập nhật nếu thay đổi để tránh reflow dư
+    if (bw !== baseWidth.value || bh !== baseHeight.value) {
+      baseWidth.value = bw
+      baseHeight.value = bh
+    }
+  }
   const vw = window.innerWidth
-  const horizontalMargin = 24 // tổng chừa hai bên
+  const horizontalMargin = 24
   const maxWidth = vw - horizontalMargin
-  const baseWidth = mapContainer.value.offsetWidth // không bị ảnh hưởng bởi transform
-  if (baseWidth === 0) return 1
-  return baseWidth > maxWidth ? maxWidth / baseWidth : 1
+  return bw > maxWidth ? maxWidth / bw : 1
 }
 
 function applyScale() {
+  if (!mapContainer.value) return
   const s = Number(calcScaleRaw().toFixed(4))
-  if (Math.abs(s - mapScale.value) > 0.0001) {
-    mapScale.value = s
-  }
+  if (Math.abs(s - mapScale.value) > 0.0001) mapScale.value = s
 }
 
 function updateScale() {
-  nextTick(() => {
-    // đợi render map xong rồi đo
-    requestAnimationFrame(applyScale)
-  })
+  nextTick(() => requestAnimationFrame(applyScale))
 }
 
 onMounted(() => {
