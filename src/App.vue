@@ -45,7 +45,7 @@
     <div style="height: 80px" />
 
     <Congratulation :show="finished" v-if="!gameover" />
-    <GameoverDialog :show="gameover" @retry="resetLevel" @close="gameover = false" />
+    <GameoverDialog :show="showGameoverDialog" @retry="resetLevel" @close="closeGameover" />
   </div>
 </template>
 
@@ -59,7 +59,9 @@ import GameoverDialog from './components/GameoverDialog.vue'
 const level = ref(2)
 const currentMap = ref(clone2d(mapData2))
 const finished = ref(false)
-const gameover = ref(false)
+const gameover = ref(false) // trạng thái game logic
+const showGameoverDialog = ref(false) // trạng thái hiển thị dialog
+const gameoverDismissed = ref(false) // đã đóng thủ công => không hiện lại
 
 function setLevel(lv: number) {
   level.value = lv
@@ -67,6 +69,8 @@ function setLevel(lv: number) {
   else currentMap.value = clone2d(mapData2)
   finished.value = false
   gameover.value = false
+  showGameoverDialog.value = false
+  gameoverDismissed.value = false
 }
 function resetLevel() {
   setLevel(level.value)
@@ -76,5 +80,10 @@ function onFinish() {
 }
 function onGameover() {
   gameover.value = true
+  if (!gameoverDismissed.value) showGameoverDialog.value = true
+}
+function closeGameover() {
+  showGameoverDialog.value = false
+  gameoverDismissed.value = true
 }
 </script>
