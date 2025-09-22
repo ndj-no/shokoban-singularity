@@ -9,8 +9,8 @@
             <transition name="heart-fly" appear>
               <div v-if="props.show" class="heart-fly max-w-[320px] text-center space-y-4">
                 <img src="/tada-chest-open.png" class="mx-auto" />
-                <!-- Badge copy code -->
-                <CopyCodeBadge code="123" />
+                <!-- Badge copy code: lấy từ env hoặc prop -->
+                <CopyCodeBadge :code="codeValue" />
                 <div class="text-4xl font-bold text-pink-600 mt-4 drop-shadow-lg w-full">
                   Happy Birthday
                 </div>
@@ -24,9 +24,23 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import CopyCodeBadge from './CopyCodeBadge.vue'
 
 const props = defineProps<{ show: boolean; code?: string }>()
+
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_CONGRATS_CODE?: string
+  }
+  interface ImportMeta {
+    readonly env: ImportMetaEnv
+  }
+}
+
+// Fallback sẽ dùng JLSKKMMFI nếu không có props.code hoặc biến môi trường
+const envCode = import.meta.env.VITE_CONGRATS_CODE || 'TEST1234'
+const codeValue = computed(() => props.code || envCode)
 </script>
 
 <style scoped>
