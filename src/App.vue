@@ -33,11 +33,8 @@
         @gameover="onGameover"
       />
     </div>
-    <div v-if="gameover" class="text-3xl font-bold text-red-600 mt-8 drop-shadow-lg animate-bounce">
-      Omae wa mou shindeiru!! 😁
-    </div>
     <div class="mt-8 text-gray-300 text-lg">
-      <span>Move: [ <b>🡠 🡢 🡡 🡣</b> ] or [ <b>W A S D</b> ]</span>
+      <span>Swipe to move</span>
       <button
         class="ml-6 px-4 py-1 rounded-lg bg-indigo-600 text-white font-bold"
         @click="resetLevel"
@@ -48,6 +45,7 @@
     <div style="height: 80px" />
 
     <Congratulation :show="finished" v-if="!gameover" />
+    <GameoverDialog :show="gameover" @retry="resetLevel" @close="gameover = false" />
   </div>
 </template>
 
@@ -56,6 +54,7 @@ import { ref } from 'vue'
 import { mapData1, mapData2, clone2d } from './utils/sokoban.ts'
 import SokobanMap from './components/SokobanMap.vue'
 import Congratulation from './components/Congratulation.vue'
+import GameoverDialog from './components/GameoverDialog.vue'
 
 const level = ref(2)
 const currentMap = ref(clone2d(mapData2))
