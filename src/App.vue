@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center min-h-screen bg-[#222] py-8">
+  <div class="flex flex-col items-center min-h-screen bg-[#222] py-8 px-2">
     <!-- <h1 class="text-xl mb-4 text-white font-bold tracking-wider drop-shadow">
       Quest for the Lost Treasure
     </h1> -->
@@ -19,19 +19,29 @@
         Màn 2 (quái vật)
       </button>
     </div>
-    <div
-      class="rounded-2xl shadow-2xl p-2"
-      style="display: inline-block; background: #bbb; border: 4px solid #222"
-    >
-      <SokobanMap
-        :initialMap="currentMap"
-        :finished="finished"
-        :gameover="gameover"
-        :monster="level === 2"
-        @update:map="(m) => (currentMap = m)"
-        @finish="onFinish"
-        @gameover="onGameover"
-      />
+    <!-- Wrapper để canh giữa và tránh chạm mép, + scale -->
+    <div class="w-full flex justify-center overflow-hidden">
+      <div
+        ref="mapContainer"
+        class="rounded-2xl shadow-2xl p-2"
+        :style="{
+          display: 'inline-block',
+          background: '#bbb',
+          border: '4px solid #222',
+          transform: `scale(${mapScale})`,
+          transformOrigin: 'top center',
+        }"
+      >
+        <SokobanMap
+          :initialMap="currentMap"
+          :finished="finished"
+          :gameover="gameover"
+          :monster="level === 2"
+          @update:map="(m) => (currentMap = m)"
+          @finish="onFinish"
+          @gameover="onGameover"
+        />
+      </div>
     </div>
     <div class="mt-8 text-gray-300 text-lg">
       <span>Swipe to move</span>
@@ -50,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { mapData1, mapData2, clone2d } from './utils/sokoban.ts'
 import SokobanMap from './components/SokobanMap.vue'
 import Congratulation from './components/Congratulation.vue'
@@ -63,6 +73,47 @@ const gameover = ref(false) // trạng thái game logic
 const showGameoverDialog = ref(false) // trạng thái hiển thị dialog
 const gameoverDismissed = ref(false) // đã đóng thủ công => không hiện lại
 
+// Thêm refs cho scale
+const mapContainer = ref<HTMLElement | null>(null)
+const mapScale = ref(1)
+
+function calcScaleRaw() {
+  if (!mapContainer.value) return 1
+  const vw = window.innerWidth
+  const horizontalMargin = 24 // tổng chừa hai bên
+  const maxWidth = vw - horizontalMargin
+  const baseWidth = mapContainer.value.offsetWidth // không bị ảnh hưởng bởi transform
+  if (baseWidth === 0) return 1
+  return baseWidth > maxWidth ? maxWidth / baseWidth : 1
+}
+
+function applyScale() {
+  const s = Number(calcScaleRaw().toFixed(4))
+  if (Math.abs(s - mapScale.value) > 0.0001) {
+    mapScale.value = s
+  }
+}
+
+function updateScale() {
+  nextTick(() => {
+    // đợi render map xong rồi đo
+    requestAnimationFrame(applyScale)
+  })
+}
+
+onMounted(() => {
+  updateScale()
+  window.addEventListener('resize', updateScale, { passive: true })
+  window.addEventListener('orientationchange', updateScale, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScale)
+  window.removeEventListener('orientationchange', updateScale)
+})
+
+watch(currentMap, () => updateScale())
+
 function setLevel(lv: number) {
   level.value = lv
   if (lv === 1) currentMap.value = clone2d(mapData1)
@@ -71,6 +122,7 @@ function setLevel(lv: number) {
   gameover.value = false
   showGameoverDialog.value = false
   gameoverDismissed.value = false
+  updateScale()
 }
 function resetLevel() {
   setLevel(level.value)
