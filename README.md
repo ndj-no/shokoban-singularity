@@ -37,3 +37,31 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## Docker
+
+### Build image
+
+```sh
+docker build -t sokoban-enhanced:latest .
+```
+
+### Run container
+
+```sh
+docker run -d --name sokoban -p 8080:80 sokoban-enhanced:latest
+```
+
+Truy cập: http://localhost:8080
+
+### Healthcheck
+
+```sh
+curl http://localhost:8080/healthz
+```
+
+### Production Suggestions
+- Thêm reverse proxy (Caddy/Traefik) để bật HTTPS.
+- Dùng `--pull=always` trong CI khi build để cập nhật base image.
+- Có thể thêm biến môi trường compile-time bằng cách khai báo trong `import.meta.env` và file `.env` rồi build lại image.
+
