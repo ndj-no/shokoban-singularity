@@ -8,7 +8,7 @@
           <div v-if="props.show" class="flex flex-col items-center relative">
             <transition name="heart-fly" appear>
               <div v-if="props.show" class="heart-fly max-w-[320px] text-center space-y-4">
-                <img src="/tada-chest-open.png" class="mx-auto" />
+                <img src="/tada-chest-open.png" class="w-[50%] mx-auto animate-bounce" />
                 <!-- Badge copy code: lấy từ env hoặc prop -->
                 <CopyCodeBadge :code="codeValue" />
                 <div class="text-4xl font-bold text-pink-600 mt-4 drop-shadow-lg w-full">
